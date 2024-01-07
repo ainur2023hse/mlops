@@ -13,4 +13,4 @@ class Config:
     image_std: list[float]
     embedding_size: int
     model_ckpt: str
-    infer_labels: str
+    infer_scores: str

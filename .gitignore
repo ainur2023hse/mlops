@@ -161,4 +161,4 @@ cython_debug/
 #.idea/
 /data
 /model_base.ckpt
-/infer_labels.csv
+/infer_scores.csv
