@@ -59,13 +59,18 @@ class Namer(object):
     def infer(self) -> None:
         with open(self.cfg.model_ckpt, "rb") as f:
             self.model.model = t_load(f)
-        scores = test(
+        res = test(
             model=self.model,
             batch_generator=self.batch_loader.get_test_batch_gen(),
             _device=self.device,
-        )["scores"]
+        )
+        scores = res["scores"]
+        labels = res["labels"]
         with open(self.cfg.infer_scores, "w") as f:
-            f.write("\n".join((str(label) for label in scores)))
+            f.write(
+                "\n".join((f"{label} {score}" for score, label in zip(scores, labels)))
+            )
+
         self.repo.add(self.cfg.infer_scores)
         self.repo.push()
 
