@@ -1,0 +1,5 @@
+outs:
+- md5: 2a9db47f8e48c5eb090681366a698087
+  size: 24987
+  hash: md5
+  path: infer_labels.csv

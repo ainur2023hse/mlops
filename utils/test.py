@@ -1,23 +1,24 @@
 import numpy as np
-import torch.nn as nn
-from torch import cuda, device, no_grad
+from torch import device, no_grad
+from torch.utils.data import DataLoader
 
 from .metrics import calculate_metrics
-
-
-device = device("cuda") if cuda.is_available() else device("cpu")
-loss_function = nn.CrossEntropyLoss()
+from .model import Model
 
 
 @no_grad()  # we do not need to save gradients on evaluation
-def test_model(model, batch_generator, subset_name="test", print_log=True):
+def test(
+    model: Model,
+    batch_generator: DataLoader,
+    _device: device,
+) -> dict:
     """
     Evaluate the model using data from
     batch_generator and metrics defined above.
     """
 
     # disable dropout / use averages for batch_norm
-    model.train(False)
+    model.model.train(False)
 
     # save scores, labels and loss values for performance logging
     score_list = []
@@ -25,23 +26,19 @@ def test_model(model, batch_generator, subset_name="test", print_log=True):
     loss_list = []
 
     for X_batch, y_batch in batch_generator:
-        # do the forward pass
-        logits = model(X_batch.to(device))
+        logits = model.model(X_batch.to(_device))
         scores = 1 / (1 + np.exp(-logits[:, 1].detach().numpy()))
         labels = y_batch.numpy().tolist()
 
         # compute loss value
-        loss = loss_function(logits, y_batch.to(device))
+        loss = model.loss_function(logits, y_batch.to(_device))
 
         # save the necessary data
         loss_list.append(loss.detach().cpu().numpy().tolist())
         score_list.extend(scores)
         label_list.extend(labels)
 
-    if print_log:
-        print("Results on {} set | ".format(subset_name), end="")
-
-    metric_results = calculate_metrics(score_list, label_list, print_log)
+    metric_results = calculate_metrics(score_list, label_list)
     metric_results["scores"] = score_list
     metric_results["labels"] = label_list
     metric_results["loss"] = loss_list

@@ -1,0 +1,14 @@
+data_path: data  # PATH TO THE DATASET
+num_workers: 4 # Number of threads for data loader
+# Image size:
+size_h: 96
+size_w: 96
+num_classes: 2 # Number of classes in the dataset
+epoch_num: 30 # Epochs
+batch_size: 256 # Batch size
+# Images mean and std channelwise
+image_mean: [0.485, 0.456, 0.406]
+image_std: [0.229, 0.224, 0.225]
+embedding_size: 128 # Last layer (embeddings) size for CNN models
+model_ckpt: "model_base.ckpt"
+infer_labels: "infer_labels.csv"
